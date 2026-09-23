@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="p-8">
+    <h1 class="text-2xl font-bold mb-6">Test Simple (Côté Client)</h1>
+    
+    <div id="mon-graphique" class="bg-white p-4 border border-slate-200 rounded-lg shadow-sm max-w-2xl"></div>
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+
+    const data = [
+      { lettre: "A", valeur: 10 },
+      { lettre: "B", valeur: 25 },
+      { lettre: "C", valeur: 15 }
+    ];
+
+    const plot = Plot.plot({
+      marks: [
+        Plot.barY(data, { x: "lettre", y: "valeur", fill: "steelblue" })
+      ]
+    });
+
+    const container = document.querySelector("#mon-graphique");
+    if (container) {
+      container.append(plot);
+    }
+  </script>
+</Layout>

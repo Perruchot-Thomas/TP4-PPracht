@@ -1,0 +1,88 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="p-8 max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Pingouins avec Filtres Multiples</h1>
+    
+    <div class="flex flex-wrap gap-6 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+
+      <div>
+        <label for="species" class="block text-sm font-semibold text-slate-700 mb-1">Espèce :</label>
+        <select id="species" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="">Toutes les espèces</option>
+          <option value="Adelie">Adelie</option>
+          <option value="Chinstrap">Chinstrap</option>
+          <option value="Gentoo">Gentoo</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="island" class="block text-sm font-semibold text-slate-700 mb-1">Île :</label>
+        <select id="island" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="">Toutes les îles</option>
+          <option value="Biscoe">Biscoe</option>
+          <option value="Dream">Dream</option>
+          <option value="Torgersen">Torgersen</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="sex" class="block text-sm font-semibold text-slate-700 mb-1">Sexe :</label>
+        <select id="sex" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500">
+          <option value="">Tous les sexes</option>
+          <option value="MALE">Mâle</option>
+          <option value="FEMALE">Femelle</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import penguins from "../../assets/penguins.json";
+
+    const selectSpecies = document.querySelector("#species") as HTMLSelectElement;
+    const selectIsland = document.querySelector("#island") as HTMLSelectElement;
+    const selectSex = document.querySelector("#sex") as HTMLSelectElement;
+    const plotContainer = document.querySelector("#plot-container");
+
+    function renderPlot() {
+      if (!plotContainer || !selectSpecies || !selectIsland || !selectSex) return;
+
+      const species = selectSpecies.value;
+      const island = selectIsland.value;
+      const sex = selectSex.value;
+      
+      plotContainer.innerHTML = "";
+
+      const plot = Plot.plot({
+        grid: true,
+        marks: [
+          Plot.dot(penguins, {
+            x: "culmen_length_mm",
+            y: "culmen_depth_mm",
+            stroke: "species",
+
+            filter: (d) => 
+              (species === "" || d.species === species) &&
+              (island === "" || d.island === island) &&
+              (sex === "" || d.sex === sex)
+          }),
+        ],
+      });
+      
+      plotContainer.append(plot);
+    };
+
+    selectSpecies?.addEventListener("change", renderPlot);
+    selectIsland?.addEventListener("change", renderPlot);
+    selectSex?.addEventListener("change", renderPlot);
+    
+
+    renderPlot();
+  </script>
+</Layout>

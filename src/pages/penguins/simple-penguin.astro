@@ -1,0 +1,35 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="p-8">
+    <h1 class="text-2xl font-bold mb-6">Pingouins Simple (Côté Client)</h1>
+    
+    <div id="mon-graphique" class="bg-white p-4 border border-slate-200 rounded-lg shadow-sm max-w-3xl"></div>
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import penguins from "../../assets/penguins.json";
+
+    const container = document.querySelector("#mon-graphique");
+    
+    if (container) {
+      container.innerHTML = "";
+      
+      const plot = Plot.plot({
+        grid: true,
+        marks: [
+          Plot.dot(penguins, {
+            x: "culmen_length_mm",
+            y: "culmen_depth_mm",
+            stroke: "species",
+          })
+        ]
+      });
+
+      container.append(plot);
+    }
+  </script>
+</Layout>
