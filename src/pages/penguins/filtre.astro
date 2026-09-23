@@ -1,23 +1,46 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import '../../styles/global.css';
 ---
 
-<Layout>
-  <div class="p-8 max-w-4xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6">Pingouins avec Filtre Interactif</h1>
+<Layout title="TP - Pingouins (Filtre)">
+  <div class="max-w-4xl mx-auto p-8 bg-white rounded-2xl border border-slate-200/80 shadow-sm mt-12 mb-12">
     
-    <div class="mb-6">
-      <label for="species" class="font-semibold text-slate-700 mr-2">Filtrer par espèce :</label>
-      <select name="species" id="species" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">All species</option>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/60 mb-2">
+          <span>TP</span>
+          <span>•</span>
+          <span>Côté Client</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          Pingouins (Filtre par Espèce)
+        </h1>
+      </div>
+
+      <a href="/" class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200/60 transition shadow-sm self-start sm:self-auto">
+        <span aria-hidden="true">←</span>
+        <span>Retour Accueil</span>
+      </a>
+    </div>
+
+    <div class="mb-8 p-4 bg-slate-50/50 rounded-xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center gap-4 shadow-sm">
+      <label for="species" class="text-sm font-semibold text-slate-700">Sélectionner une espèce :</label>
+      <select id="species" class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Toutes les espèces</option>
         <option value="Adelie">Adelie</option>
         <option value="Chinstrap">Chinstrap</option>
         <option value="Gentoo">Gentoo</option>
       </select>
     </div>
 
-    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+    <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 w-full">
+      <div id="plot-container" class="overflow-x-auto min-h-[400px]"></div>
+      
+      <footer class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+        <span>Source : Palmer Station LTER</span>
+        <span id="footer-legend">Filtrage interactif</span>
+      </footer>
+    </section>
   </div>
 
   <script>
@@ -29,27 +52,24 @@ import '../../styles/global.css';
 
     function renderPlot() {
       if (!plotContainer || !selectSpecies) return;
-
       const species = selectSpecies.value;
-      
       plotContainer.innerHTML = "";
 
       const plot = Plot.plot({
-        grid: true,
+        grid: true, inset: 10,
+        color: { legend: true },
         marks: [
+          Plot.frame({ stroke: "#e2e8f0" }),
           Plot.dot(penguins, {
-            x: "culmen_length_mm",
-            y: "culmen_depth_mm",
-            stroke: "species",
+            x: "culmen_length_mm", y: "culmen_depth_mm", fill: "species", r: 4, tip: true,
             filter: (d) => species === "" || d.species === species
-          }),
-        ],
+          })
+        ]
       });
-      
       plotContainer.append(plot);
     };
+
     selectSpecies?.addEventListener("change", renderPlot);
-    
     renderPlot();
   </script>
 </Layout>

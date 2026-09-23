@@ -2,18 +2,41 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Pizza Simple">
-  <div class="p-8 max-w-4xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-slate-900">Pizzas sans filtre (Côté Client)</h1>
-      <a href="/" class="text-sm font-semibold px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">← Retour</a>
+<Layout title="TP - Pizzas (Simple)">
+  <div class="max-w-4xl mx-auto p-8 bg-white rounded-2xl border border-slate-200/80 shadow-sm mt-12 mb-12">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200/80 mb-2">
+          <span>TP</span>
+          <span>•</span>
+          <span>Côté Client</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          Toutes les Pizzas
+        </h1>
+      </div>
+
+      <a href="/" class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 transition shadow-sm self-start sm:self-auto">
+        <span aria-hidden="true">←</span>
+        <span>Retour Accueil</span>
+      </a>
     </div>
-    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+
+    <section class="bg-slate-50/50 rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 w-full">
+      <h2 class="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-4">Aperçu Global</h2>
+      
+      <div id="plot-container" class="overflow-x-auto min-h-[400px]"></div>
+      
+      <footer class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+        <span>Source : Data Pizza</span>
+        <span>Données non filtrées</span>
+      </footer>
+    </section>
   </div>
 
   <script>
     import * as Plot from "@observablehq/plot";
-    // On remonte de deux dossiers pour trouver assets
     import pizzaData from "../../assets/pizza.json";
 
     const plotContainer = document.querySelector("#plot-container");
@@ -21,22 +44,15 @@ import Layout from '../../layouts/Layout.astro';
       plotContainer.innerHTML = "";
       
       const plot = Plot.plot({
-        grid: true,
-        inset: 10,
+        grid: true, inset: 10,
         x: { label: "Prix ($)", domain: [10, 28] },
         y: { label: "Nombre de commandes", domain: [0, 450] },
+        color: { legend: true }, 
         marks: [
           Plot.frame({ stroke: "#e2e8f0" }),
-          Plot.dot(pizzaData, {
-            x: "price",
-            y: "orders",
-            fill: "category",
-            r: 5,
-            tip: true
-          })
+          Plot.dot(pizzaData, { x: "price", y: "orders", fill: "category", r: 5, tip: true })
         ]
       });
-      
       plotContainer.append(plot);
     }
   </script>

@@ -2,18 +2,31 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Pizzas avec Filtres Multiples">
-  <div class="p-8 max-w-4xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-slate-900">Ventes de Pizzas (Filtres Multiples)</h1>
-      <a href="/" class="text-sm font-semibold px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">← Retour</a>
-    </div>
+<Layout title="TP - Pizzas (Filtres Multiples)">
+  <div class="max-w-4xl mx-auto p-8 bg-white rounded-2xl border border-slate-200/80 shadow-sm mt-12 mb-12">
     
-    <div class="flex flex-wrap gap-6 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
-      <!-- Filtre Catégorie -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
       <div>
-        <label for="category" class="block text-sm font-semibold text-slate-700 mb-1">Catégorie :</label>
-        <select id="category" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-500">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200/80 mb-2">
+          <span>TP</span>
+          <span>•</span>
+          <span>Côté Client</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          Pizzas (Filtres Combinés)
+        </h1>
+      </div>
+
+      <a href="/" class="inline-flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 transition shadow-sm self-start sm:self-auto">
+        <span aria-hidden="true">←</span>
+        <span>Retour Accueil</span>
+      </a>
+    </div>
+
+    <div class="mb-8 p-6 bg-slate-50/50 rounded-xl border border-slate-200/80 flex flex-wrap gap-6 shadow-sm">
+      <div class="flex flex-col gap-2">
+        <label for="category" class="text-sm font-semibold text-slate-700">Catégorie :</label>
+        <select id="category" class="w-48 px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
           <option value="">Toutes les catégories</option>
           <option value="Classic">Classic</option>
           <option value="Specialty">Specialty</option>
@@ -21,10 +34,9 @@ import Layout from '../../layouts/Layout.astro';
         </select>
       </div>
 
-      <!-- Filtre Prix -->
-      <div>
-        <label for="price-range" class="block text-sm font-semibold text-slate-700 mb-1">Tranche de prix :</label>
-        <select id="price-range" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-500">
+      <div class="flex flex-col gap-2">
+        <label for="price-range" class="text-sm font-semibold text-slate-700">Tranche de prix :</label>
+        <select id="price-range" class="w-48 px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
           <option value="">Tous les prix</option>
           <option value="low">Moins de 15 $</option>
           <option value="high">15 $ et plus</option>
@@ -32,7 +44,13 @@ import Layout from '../../layouts/Layout.astro';
       </div>
     </div>
 
-    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+    <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8 w-full">
+      <div id="plot-container" class="overflow-x-auto min-h-[400px]"></div>
+      <footer class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+        <span>Source : Data Pizza</span>
+        <span>Recherche multi-critères</span>
+      </footer>
+    </section>
   </div>
 
   <script>
@@ -52,36 +70,24 @@ import Layout from '../../layouts/Layout.astro';
       plotContainer.innerHTML = "";
 
       const plot = Plot.plot({
-        grid: true,
-        inset: 10,
+        grid: true, inset: 10,
         x: { label: "Prix ($)", domain: [10, 28] },
         y: { label: "Nombre de commandes", domain: [0, 450] },
+        color: { legend: true },
         marks: [
           Plot.frame({ stroke: "#e2e8f0" }),
           Plot.dot(pizzaData, {
-            x: "price",
-            y: "orders",
-            fill: "category",
-            r: 5,
-            tip: true,
+            x: "price", y: "orders", fill: "category", r: 5, tip: true,
             filter: (d) => {
-              // Condition 1 : Catégorie
               const matchCategory = category === "" || d.category === category;
-              
-              // Condition 2 : Tranche de prix
               let matchPrice = true;
-              if (priceRange === "low") {
-                matchPrice = Number(d.price) < 15;
-              } else if (priceRange === "high") {
-                matchPrice = Number(d.price) >= 15;
-              }
-
+              if (priceRange === "low") matchPrice = Number(d.price) < 15;
+              else if (priceRange === "high") matchPrice = Number(d.price) >= 15;
               return matchCategory && matchPrice;
             }
-          }),
-        ],
+          })
+        ]
       });
-      
       plotContainer.append(plot);
     };
 
