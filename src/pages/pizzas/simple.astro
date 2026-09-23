@@ -1,0 +1,43 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Pizza Simple">
+  <div class="p-8 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-slate-900">Pizzas sans filtre (Côté Client)</h1>
+      <a href="/" class="text-sm font-semibold px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">← Retour</a>
+    </div>
+    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    // On remonte de deux dossiers pour trouver assets
+    import pizzaData from "../../assets/pizza.json";
+
+    const plotContainer = document.querySelector("#plot-container");
+    if (plotContainer) {
+      plotContainer.innerHTML = "";
+      
+      const plot = Plot.plot({
+        grid: true,
+        inset: 10,
+        x: { label: "Prix ($)", domain: [10, 28] },
+        y: { label: "Nombre de commandes", domain: [0, 450] },
+        marks: [
+          Plot.frame({ stroke: "#e2e8f0" }),
+          Plot.dot(pizzaData, {
+            x: "price",
+            y: "orders",
+            fill: "category",
+            r: 5,
+            tip: true
+          })
+        ]
+      });
+      
+      plotContainer.append(plot);
+    }
+  </script>
+</Layout>

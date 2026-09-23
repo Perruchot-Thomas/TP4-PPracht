@@ -1,0 +1,93 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Pizzas avec Filtres Multiples">
+  <div class="p-8 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-slate-900">Ventes de Pizzas (Filtres Multiples)</h1>
+      <a href="/" class="text-sm font-semibold px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">← Retour</a>
+    </div>
+    
+    <div class="flex flex-wrap gap-6 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+      <!-- Filtre Catégorie -->
+      <div>
+        <label for="category" class="block text-sm font-semibold text-slate-700 mb-1">Catégorie :</label>
+        <select id="category" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-500">
+          <option value="">Toutes les catégories</option>
+          <option value="Classic">Classic</option>
+          <option value="Specialty">Specialty</option>
+          <option value="Vegetarian">Vegetarian</option>
+        </select>
+      </div>
+
+      <!-- Filtre Prix -->
+      <div>
+        <label for="price-range" class="block text-sm font-semibold text-slate-700 mb-1">Tranche de prix :</label>
+        <select id="price-range" class="px-4 py-2 rounded-lg border border-slate-300 shadow-sm focus:ring-2 focus:ring-emerald-500">
+          <option value="">Tous les prix</option>
+          <option value="low">Moins de 15 $</option>
+          <option value="high">15 $ et plus</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="plot-container" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm min-h-[400px]"></div>
+  </div>
+
+  <script>
+    import * as Plot from "@observablehq/plot";
+    import pizzaData from "../../assets/pizza.json";
+
+    const selectCategory = document.querySelector("#category") as HTMLSelectElement;
+    const selectPrice = document.querySelector("#price-range") as HTMLSelectElement;
+    const plotContainer = document.querySelector("#plot-container");
+
+    function renderPlot() {
+      if (!plotContainer || !selectCategory || !selectPrice) return;
+
+      const category = selectCategory.value;
+      const priceRange = selectPrice.value;
+      
+      plotContainer.innerHTML = "";
+
+      const plot = Plot.plot({
+        grid: true,
+        inset: 10,
+        x: { label: "Prix ($)", domain: [10, 28] },
+        y: { label: "Nombre de commandes", domain: [0, 450] },
+        marks: [
+          Plot.frame({ stroke: "#e2e8f0" }),
+          Plot.dot(pizzaData, {
+            x: "price",
+            y: "orders",
+            fill: "category",
+            r: 5,
+            tip: true,
+            filter: (d) => {
+              // Condition 1 : Catégorie
+              const matchCategory = category === "" || d.category === category;
+              
+              // Condition 2 : Tranche de prix
+              let matchPrice = true;
+              if (priceRange === "low") {
+                matchPrice = Number(d.price) < 15;
+              } else if (priceRange === "high") {
+                matchPrice = Number(d.price) >= 15;
+              }
+
+              return matchCategory && matchPrice;
+            }
+          }),
+        ],
+      });
+      
+      plotContainer.append(plot);
+    };
+
+    selectCategory?.addEventListener("change", renderPlot);
+    selectPrice?.addEventListener("change", renderPlot);
+    
+    renderPlot();
+  </script>
+</Layout>
